@@ -4,7 +4,7 @@ import { Container } from 'react-bootstrap';
 import {faHome,faUpload} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function App() {
+function HomePage() {
   return (
     <Container>
     
@@ -15,4 +15,4 @@ function App() {
   );
 }
 
-export default App;
+export default HomePage;
