@@ -31,7 +31,7 @@ export default function api(
     }
 
     export interface ApiResponse {
-        status: 'ok' | 'error' | 'login';
+        status: 'ok' | 'error';
         data: any;
     }
 

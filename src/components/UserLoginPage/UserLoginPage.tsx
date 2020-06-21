@@ -64,16 +64,23 @@ export default  class UserLoginPage extends React.Component{
                     switch(res.data.statusCode){
                         case -3001: message = "Non-existing username"; break;
                         case -3002: message = "Wrong password"; break;
+                        default: message = "Something is wrong"; break;
                     }
                     this.setErrorMessage(message);
                     return;
                 }
-
-                saveToken(res.data.token);
-                this.setLoggedInState(true);
-                this.setErrorMessage("You are logged in!");
-                return;
-                //Preusmeriti korisnika:
+                //ERROR: Kada se posalju ispravni user i pass, ne vraca nista,
+                //       zato sam izmestila setLoggedInState van ovog bloka
+                //       gde pita da li je status==='ok'; Dalje radim kao da je ulogovan :(
+                if(res.data.token === undefined){
+                    this.setErrorMessage("Govno kaze da ga nema");
+                    console.log(res.data.token);
+                    saveToken(res.data.token);
+                    this.setLoggedInState(true);
+                }
+                //res.data.getToken();
+               
+                //this.setErrorMessage("You are logged in!");
             }
         });
     }

@@ -13,15 +13,17 @@ import { HashRouter, Switch, Route } from 'react-router-dom';
 import ContactPage from './components/ContactPage/ContactPage';
 import UserLoginPage from './components/UserLoginPage/UserLoginPage';
 import ClientPage from './components/ClientPage/ClientPage';
+import RoomPage from './components/RoomPage/RoomPage';
+import RentablePage from './components/RentablePage/RentablePage';
 
 const menuItems = [
   new MainMenuItem("Home","/"),
   new MainMenuItem("Contact","/contact/"),
   new MainMenuItem("About us","/about/"),
   new MainMenuItem("Log in","/user/login/"),
-  new MainMenuItem("Client 1","/client/1/"),
-  new MainMenuItem("Client 2","/client/2/"),
-  new MainMenuItem("Client 3","/client/3/")
+  //new MainMenuItem("Client 1","/client/1/"),
+  //new MainMenuItem("Client 2","/client/2/"),
+  //new MainMenuItem("Client 3","/client/3/")
 ];
 ReactDOM.render(
   <React.StrictMode>
@@ -32,6 +34,8 @@ ReactDOM.render(
         <Route exact path="/contact" component={ ContactPage } />
         <Route exact path="/user/login" component={ UserLoginPage } />
         <Route exact path="/client/:id" component = { ClientPage } />
+        <Route exact path="/rooms" component = { RoomPage } />
+        <Route exact path="/rentables" component = { RentablePage } />
       </Switch>
     </HashRouter>
   </React.StrictMode>,
