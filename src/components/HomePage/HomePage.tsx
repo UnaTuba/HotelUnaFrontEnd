@@ -63,7 +63,7 @@ class HomePage extends React.Component {
     <Card.Img variant="top" src="holder.js/100px160" />
     <Card.Body>
       <Card.Title>
-        <Link to="/rentables" className="btn-outline-primary">Rooms</Link>
+        <Link to="/rooms" className="btn-outline-primary">Rooms</Link>
       </Card.Title>
       <Card.Text>
         Enjoy the luxury of hotel rooms. Hotel Una offers rooms for everyone.

@@ -1,11 +1,8 @@
 import React from 'react';
-import { Container, Card, Row } from 'react-bootstrap';
+import { Container, Card } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListAlt } from '@fortawesome/free-solid-svg-icons';
 import RoomType from '../../types/RoomType';
-import ConferenceRoomType from '../../types/ConferenceRoomType';
-import RentableType from '../../types/RentableType';
-import { Redirect } from 'react-router-dom';
 import api, { ApiResponse } from '../../api/api';
 
 interface RoomPageProperties{
@@ -16,11 +13,22 @@ interface RoomPageProperties{
     }
 }
 
+interface RoomDto {
+    roomId?: number;
+    numOfBeds?: number;
+    bedType?: "single" | "double" | "bunk_bed" | "king_size";
+    balcony?: boolean;
+    orientation?: "east" | "west" | "south" | "north";
+    floor?: number;
+    closet?: boolean;
+    desk?: boolean;
+    airConditioner?: boolean;
+    roomNumber?: number;
+}
+
 interface RoomPageState{
     isUserLoggedIn: boolean;
-    rentable?: RentableType;
-    room?: RoomType;
-    conferenceRoom?: ConferenceRoomType;
+    rooms: RoomDto[];
     message: string;
 }
 
@@ -29,10 +37,7 @@ export default class RoomPage extends React.Component<RoomPageProperties>{
     constructor(props: Readonly<RoomPageProperties>) {
         super(props);
 
-        this.state = { 
-            isUserLoggedIn: true,
-            message: ""
-        };
+        this.state = { isUserLoggedIn: true, message: '', rooms: []};
     }
 
     private setLogginState(isLoggedIn: boolean) {
@@ -50,203 +55,140 @@ export default class RoomPage extends React.Component<RoomPageProperties>{
 
         this.setState(newState);
     }
-
-    private setRoomData(room: RoomType) {
+/*
+    private setClientData(client: ClientType) {
+        console.log(client);
         this.setState(Object.assign(this.state, {
-            room: room,
+            client: client,
         }));
     }
-
-    private setConferenceRoom(conferenceRoom: ConferenceRoomType[]) {
+*/
+    private setRoomData(rooms: RoomType[]) {
+        console.log(rooms);
         this.setState(Object.assign(this.state, {
-            conferenceRoom: conferenceRoom,
+            rooms: rooms,
         }));
     }
 
     render(){
-        if (this.state.isUserLoggedIn === false) {
-            return (
-                <Redirect to="/user/login" />
-            );
-        }
-        return (
+        return(
             <Container>
-                <Card>
-                    <Card.Body>
-                        <Card.Title>
-                            <FontAwesomeIcon icon={ faListAlt } /> { this.state.room?.roomId }
-                        </Card.Title>
-
-                        { this.showRooms() }
-                    </Card.Body>
-                </Card>
-            </Container>
+            <Card>
+                <Card.Body>
+                    <Card.Title>
+                    <FontAwesomeIcon icon={ faListAlt } /> All rooms in Hotel Una
+                    </Card.Title>
+                    <Card.Text>
+                       
+                        { this.state.rooms.map(this.printRoomRow, this) }
+                        
+                    </Card.Text>
+                </Card.Body>
+            </Card>
+            
+        </Container>
         );
     }
 
-    /*componentWillMount(){
-        this.getRoomData();
-    }*/
+    private printRoomRow(room: RoomType) {
+        return (
+            <tr>
+                <td>Room number: { room.roomNumber}</td>
+                <td> Floor: {room.floor }  </td>
+                <td> Number of beds {room.numOfBeds }  </td>
+                <td> Bed type { room.bedType }  </td>
+                <td> Room orientation { room.orientation }  </td>
+                <td> Balcony {room.balcony }  </td>
+                <td> Air Conditioner { room.airConditioner }</td>
+                <td> Closet { room.closet }</td>
+                <td> Desk { room.desk }</td>
+            </tr>
+        );
+    }
+   /* componentWillMount(){
+        this.getClientData();
+    }
 
-    /*componentWillReceiveProps(newProperties: RoomPageProperties){
+    componentWillReceiveProps(newProperties: ClientPageProperties){
         if (newProperties.match.params.id === this.props.match.params.id){
             return;
         }
 
-        this.getRoomData();
+        this.getClientData();
     }*/
-
-    private showRooms(){
-        if (this.state.room === undefined) {
-            return;
-        }
-
-        return (
-            <Row>
-                { this.state.room?.roomNumber }
-            </Row>
-        );
-    }
-    /*private getRoomData() {
-        //simuliramo logiku dostavljanja podataka
-        /*setTimeout(() => 
-        {
-            const data: RoomType = {
-                roomNumber: this.props.match.params.id,
-                roomId: this.props.match.params.id
-            };
-
-            this.setState({room: data,})
-        }, 750);
-    }*/
-
-
-
-
 
     componentDidMount() {
         this.getRoomData();
     }
 
     componentDidUpdate(oldProperties: RoomPageProperties) {
-        /*if (oldProperties.match.params.id === this.props.match.params.id) {
+        if (oldProperties.match.params.id === this.props.match.params.id) {
             return;
-        }*/
+        }
 
         this.getRoomData();
     }
 
     private getRoomData() {
-        api('api/room/' + this.props.match.params.id, 'get', {})
+//+ this.props.match.params.id
+        api('api/room' , 'get', {})
         .then((res: ApiResponse) => {
-           // if (res.status === 'login') {
-            //    return this.setLogginState(false);
-            //}
+            const data: RoomDto[] = res.data;
+            const rooms: RoomType[] = data.map(room => ({
+                roomId: room.roomId,
+                numOfBeds: room.numOfBeds,
+                bedType: room.bedType,
+                balcony: room.balcony,
+                orientation: room.orientation,
+                floor: room.floor,
+                closet: room.closet,
+                desk: room.closet,
+                airConditioner: room.airConditioner,
+                roomNumber: room.roomNumber
+            }));
+            if (res.status === 'login') {
+                return this.setLogginState(false);
+            }
 
             if (res.status === 'error') {
                 return this.setMessage('Request error. Please try to refresh the page.');
             }
+/*
+            const clientData: ClientType = {
+                clientId: res.data.clientId,
+                forename: res.data.forename,
+                surname: res.data.surname,
+                phone: res.data.phone,
+                address: res.data.address,
+            };
+            */
+            
+            this.setRoomData(rooms);
+/*
+            const subcategories: ClientType[] =
+            res.data.categories.map((client: ApiClientDto) => {
+                return {
+                    clientId: client.clientId,
+                    forename: client.forename,
+                    surname: client.surname,
+                    phone: client.phone,
+                    address: client.address,
+                }
+            });
 
-            const roomData: RoomType = {
-                roomId: res.data.categoryId,
-                roomNumber: res.data.roomNumber,
-                bedType: res.data.bedType
-                //set other params that are needed
+            this.setSubcategories(subcategories);*/
+
+
+            //simuliramo logiku dostavljanja podataka
+        /*setTimeout(() => 
+        {
+            const data: ClientType = {
+                forename: 'Client: ' + this.props.match.params.id,
+                clientId: this.props.match.params.id
             };
 
-            this.setRoomData(roomData);
-/*
-            const subcategories: CategoryType[] =
-            res.data.categories.map((category: ApiCategoryDto) => {
-                return {
-                    categoryId: category.categoryId,
-                    name: category.name,
-                    bedType: 
-                }
-            });
-
-            this.setSubcategories(subcategories);
-    */
+            this.setState({client: data,})
+        }, 750);*/
         });
-/*
-        const orderParts = this.state.filters.order.split(' ');
-        const orderBy = orderParts[0];
-        const orderDirection = orderParts[1].toUpperCase();
-
-        const featureFilters: any[] = [];
-
-        for (const item of this.state.filters.selectedFeatures) {
-            let found = false;
-            let foundRef = null;
-
-            for (const featureFilter of featureFilters) {
-                if (featureFilter.featureId === item.featureId) {
-                    found = true;
-                    foundRef = featureFilter;
-                    break;
-                }
-            }
-
-            if (!found) {
-                featureFilters.push({
-                    featureId: item.featureId,
-                    values: [ item.value ],
-                });
-            } else {
-                foundRef.values.push(item.value);
-            }
-        }
-*/
-        api('api/room/search/', 'post', {
-            roomId: Number(this.props.match.params.id),
-            //keywords: this.state.filters.keywords,
-            //priceMin: this.state.filters.priceMininum,
-            //priceMax: this.state.filters.priceMaximum,
-            //features: featureFilters,
-            //orderBy: orderBy,
-            //orderDirection: orderDirection,
-        })
-        .then((res: ApiResponse) => {
-           // if (res.status === 'login') {
-           //     return this.setLogginState(false);
-           // }
-
-            if (res.status === 'error') {
-                return this.setMessage('Request error. Please try to refresh the page.');
-            }
-
-            if (res.data.statusCode === 0) {
-                this.setMessage('');
-                //this.setArticles([]);
-                return;
-            }
-/*
-            const articles: ArticleType[] =
-            res.data.map((article: ArticleDto) => {
-                const object: ArticleType = {
-                    articleId: article.articleId,
-                    name: article.name,
-                    excerpt: article.excerpt,
-                    description: article.description,
-                    imageUrl: '',
-                    price: 0,
-                };
-
-                if (article.photos !== undefined && article.photos?.length > 0) {
-                    object.imageUrl = article.photos[article.photos?.length-1].imagePath;
-                }
-
-                if (article.articlePrices !== undefined && article.articlePrices?.length > 0) {
-                    object.price = article.articlePrices[article.articlePrices?.length-1].price;
-                }
-
-                return object;
-            });
-
-            this.setArticles(articles);
-            */
-        });
-
-       // this.getFeatures();
     }
 }
