@@ -3,6 +3,6 @@ export default class ClientType{
     surname?: string;
     clientId?: number;
     phone?: string;
-    address?: string;
+    email?: string;
     //items?: 
 }

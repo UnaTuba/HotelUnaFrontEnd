@@ -3,7 +3,7 @@ export default interface ApiClientDto {
     forename?: string;
     surname?: string;
     phone?: string;
-    address?: string;
+    email?: string;
     //items?: 
 }
 
