@@ -1,12 +1,13 @@
 import React from 'react';
-import { Container, Card, Row } from 'react-bootstrap';
+import { Container, Card, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListAlt } from '@fortawesome/free-solid-svg-icons';
 import RoomType from '../../types/RoomType';
 import ConferenceRoomType from '../../types/ConferenceRoomType';
 import RentableType from '../../types/RentableType';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import api, { ApiResponse } from '../../api/api';
+import SingleRoomPreview from '../SingleRoomPreview/SingleRoomPreview';
 
 interface RentablePageProperties{
     match: {
@@ -97,8 +98,12 @@ export default class RentablePage extends React.Component<RentablePageProperties
                         <Card.Title>
                             <FontAwesomeIcon icon={ faListAlt } /> { this.state.room?.roomId }
                         </Card.Title>
-
-                        { this.showRooms() }
+                        <Row>
+                            <Col xs="12" md="8" lg="9">
+                                { /*this.showRooms()*/this.state.rentable?.price }
+                            </Col>
+                        </Row>
+                        
                     </Card.Body>
                 </Card>
             </Container>
@@ -109,23 +114,24 @@ export default class RentablePage extends React.Component<RentablePageProperties
         this.getRoomData();
     }*/
 
-    /*componentWillReceiveProps(newProperties: RoomPageProperties){
-        if (newProperties.match.params.id === this.props.match.params.id){
-            return;
-        }
-
-        this.getRoomData();
-    }*/
-
     private showRooms(){
         if (this.state.room === undefined) {
-            return;
+            return(
+                <div>There are no rooms to be shown.</div>
+            );
         }
 
         return (
             <Row>
-                { this.state.room?.roomNumber }
+                <SingleRoomPreview room={this.state.room} />
+                Price: { Number(this.state.rentable?.price).toFixed(2) } RSD      
             </Row>
+        );
+    }
+
+    private singleRoom(room: RoomType) {
+        return (
+            <SingleRoomPreview room={room} />
         );
     }
     /*private getRoomData() {
@@ -141,12 +147,29 @@ export default class RentablePage extends React.Component<RentablePageProperties
         }, 750);
     }*/
 
-
+    private singleRentable(rentable: RentableType) {
+        return (
+            <Col lg="3" md="4" sm="6" xs="12">
+                <Card className="mb-3">
+                    <Card.Body>
+                        <Card.Title as="p">
+                            { rentable.rentableId }
+                            { rentable.price }
+                        </Card.Title>
+                        <Link to={ `/rentable/${ rentable.rentableId }` }
+                              className="btn btn-primary btn-block btn-sm">
+                            Open room
+                        </Link>
+                    </Card.Body>
+                </Card>
+            </Col>
+        );
+    }
 
 
 
     componentDidMount() {
-        this.getRoomData();
+        this.getRentableData();
     }
 
     componentDidUpdate(oldProperties: RentablePageProperties) {
@@ -154,7 +177,7 @@ export default class RentablePage extends React.Component<RentablePageProperties
             return;
         }
 
-        this.getRoomData();
+        this.getRentableData();
     }
 
     private getRoomData() {
@@ -230,9 +253,9 @@ export default class RentablePage extends React.Component<RentablePageProperties
             //orderDirection: orderDirection,
         })
         .then((res: ApiResponse) => {
-          //  if (res.status === 'login') {
-          //      return this.setLogginState(false);
-          //  }
+          if (res.status === 'login') {
+                return this.setLogginState(false);
+        }
 
             if (res.status === 'error') {
                 return this.setMessage('Request error. Please try to refresh the page.');
@@ -240,7 +263,7 @@ export default class RentablePage extends React.Component<RentablePageProperties
 
             if (res.data.statusCode === 0) {
                 this.setMessage('');
-                //this.setRoom();
+                //this.setRooms();
                 return;
             }
 
@@ -269,5 +292,82 @@ export default class RentablePage extends React.Component<RentablePageProperties
         }); 
 
        // this.getFeatures();
+    }
+
+    private getRentableData() {
+        api('api/rentable',  'get', {})
+        .then((res: ApiResponse) => {
+            if (res.status === 'login') {
+                return this.setLogginState(false);
+            }
+
+            if (res.status === 'error') {
+                console.log('Request error. Please try to refresh the page.');
+                return this.setMessage('Request error. Please try to refresh the page.');
+            }
+
+            const rentableData: RentableType = {
+                rentableId: res.data.rentableId,
+                roomId: res.data.roomId,
+                conferenceRoomId: res.data.conferenceRoomId,
+                wifi: res.data.wifi,
+                price: res.data.price,
+                //maxCapacity: res.data.maxCapacity,
+            };
+
+            this.setRentableData(rentableData);
+
+            
+
+            //this.setSubcategories(subcategories);
+        });
+
+        api('api/room/search/', 'post', {
+            roomId: Number(this.props.match.params.id),
+            //keywords: this.state.filters.keywords,
+            //priceMin: this.state.filters.priceMininum,
+            //priceMax: this.state.filters.priceMaximum,
+            //features: featureFilters,
+            //orderBy: orderBy,
+            //orderDirection: orderDirection,
+        })
+        .then((res: ApiResponse) => {
+          if (res.status === 'login') {
+                return this.setLogginState(false);
+        }
+
+            if (res.status === 'error') {
+                return this.setMessage('Request error. Please try to refresh the page.');
+            }
+
+            if (res.data.statusCode === 0) {
+                this.setMessage('');
+                //this.setRooms();
+                return;
+            }
+
+            const room: RoomType =
+            res.data.map((room: RoomDto) => {
+                const object: RoomType = {
+                    roomId: room.roomId,
+                    roomNumber: room.roomNumber,
+                    numOfBeds: room.numOfBeds,
+                    bedType: room.bedType,
+                    balcony: room.balcony,
+                    orientation: room.orientation,
+                    floor: room.floor,
+                    closet: room.closet,
+                    desk: room.desk,
+                    airConditioner: room.airConditioner
+                };
+
+                
+
+                return object;
+            });
+
+            this.setRoom(room);
+            
+        }); 
     }
 }
