@@ -20,10 +20,12 @@ const menuItems = [
   new MainMenuItem("Home","/"),
   new MainMenuItem("Contact","/contact/"),
   new MainMenuItem("About us","/about/"),
+  new MainMenuItem("Clients","/clients/"),
   new MainMenuItem("Log in","/user/login/"),
   //new MainMenuItem("Client 1","/client/1/"),
   //new MainMenuItem("Client 2","/client/2/"),
   //new MainMenuItem("Client 3","/client/3/")
+  //<Route exact path="/client/:id" component = { ClientPage } />
 ];
 ReactDOM.render(
   <React.StrictMode>
@@ -33,7 +35,8 @@ ReactDOM.render(
         <Route exact path="/" component={ HomePage } />
         <Route exact path="/contact" component={ ContactPage } />
         <Route exact path="/user/login" component={ UserLoginPage } />
-        <Route exact path="/client/:id" component = { ClientPage } />
+        
+        <Route exact path="/clients" component = { ClientPage } />
         <Route exact path="/rooms" component = { RoomPage } />
         <Route exact path="/rentables" component = { RentablePage } />
       </Switch>
