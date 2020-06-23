@@ -1,6 +1,7 @@
 import React from 'react';
-import { Nav, Container } from 'react-bootstrap';
+import { Nav, Container, Card, CardImg } from 'react-bootstrap';
 import { Link, HashRouter } from 'react-router-dom';
+
 
 export class MainMenuItem {
     text: string ='';
@@ -47,12 +48,23 @@ export class MainMenu extends React.Component<MainMenuProperties> {
     
     render(){
         return (
+            
             <Container>
+                <Card> 
+                    <Card.Header >
+                        <CardImg
+                   
+                    src="https://cdn.pixabay.com/photo/2016/11/10/19/20/banner-1814989__340.jpg" 
+                    alt="Logo" 
+                    />
+                </Card.Header>
+              </Card>
                 <Nav variant="tabs">
                     <HashRouter>
                         { this.state.items.map(this.makeNavLink) }
                     </HashRouter>
                 </Nav>
+                
             </Container>
         );
     }

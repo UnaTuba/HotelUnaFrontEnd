@@ -1,6 +1,6 @@
 import React from 'react';
 //import './App.css';
-import { Container, Card, CardGroup } from 'react-bootstrap';
+import { Container, Card, CardGroup, CardImg } from 'react-bootstrap';
 import {faHome} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RentableType from '../../types/RentableType';
@@ -66,11 +66,13 @@ class HomePage extends React.Component {
         <Link to="/rooms" className="btn-outline-primary">Rooms</Link>
       </Card.Title>
       <Card.Text>
-        Enjoy the luxury of hotel rooms. Hotel Una offers rooms for everyone.
+        Enjoy the luxury of hotel rooms. Hotel Una offers rooms for everyone, in various price ranges.
       </Card.Text>
     </Card.Body>
     <Card.Footer>
-      <small className="text-muted">Last updated 3 mins ago</small>
+    <CardImg src="https://cdn.pixabay.com/photo/2018/01/23/20/48/hotel-3102375__340.jpg" 
+              alt="Logo"/>    
+      
     </Card.Footer>
   </Card>
   
@@ -83,7 +85,9 @@ class HomePage extends React.Component {
       </Card.Text>
     </Card.Body>
     <Card.Footer>
-      <small className="text-muted">Last updated 3 mins ago</small>
+    
+    <CardImg src="https://cdn.pixabay.com/photo/2020/04/20/08/24/office-5067104_960_720.jpg" 
+              alt="Logo"/>
     </Card.Footer>
   </Card>
 </CardGroup>

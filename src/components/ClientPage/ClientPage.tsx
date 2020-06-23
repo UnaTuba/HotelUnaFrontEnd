@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListAlt } from '@fortawesome/free-solid-svg-icons';
 import ClientType from '../../types/ClientType';
 import api, { ApiResponse } from '../../api/api';
-import ApiClientDto from '../../dtos/api.client.dto';
+import { Redirect } from 'react-router-dom';
 
 interface ClientPageProperties{
     match: {
@@ -32,7 +32,6 @@ export default class ClientPage extends React.Component<ClientPageProperties>{
     state: ClientPageState;
     constructor(props: Readonly<ClientPageProperties>) {
         super(props);
-
         this.state = { isUserLoggedIn: true, message: '', clients: []};
     }
 
@@ -67,6 +66,11 @@ export default class ClientPage extends React.Component<ClientPageProperties>{
     }
 
     render(){
+        if (this.state.isUserLoggedIn === false) {
+            return (
+                <Redirect to="/user/login" />
+            );
+        }
         return(
             <Container>
             <Card>

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListAlt } from '@fortawesome/free-solid-svg-icons';
 import RoomType from '../../types/RoomType';
 import api, { ApiResponse } from '../../api/api';
+import { Redirect } from 'react-router-dom';
 
 interface RoomPageProperties{
     match: {
@@ -71,6 +72,11 @@ export default class RoomPage extends React.Component<RoomPageProperties>{
     }
 
     render(){
+        if (this.state.isUserLoggedIn === false) {
+            return (
+                <Redirect to="/user/login" />
+            );
+        }
         return(
             <Container>
             <Card>

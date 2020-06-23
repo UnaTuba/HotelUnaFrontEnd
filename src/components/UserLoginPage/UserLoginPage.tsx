@@ -48,6 +48,12 @@ export default  class UserLoginPage extends React.Component{
         this.setState(newState);
     }
 
+    
+    doLogout(){
+        this.setLoggedInState(false);
+        localStorage.clear();
+        window.location.href = '/';
+    }
     private doLogin() {
         api('/auth/user/login','post', 
                 { username: this.state.username,
@@ -128,6 +134,10 @@ export default  class UserLoginPage extends React.Component{
                                 </Button>
                             </Form.Group>
                         </Form>
+                        <Button variant="primary"
+                                        onClick={ () => this.doLogout()}>
+                                    Log out
+                                </Button>
                     </Card.Text>
                     <Alert variant="danger"
                             className = {this.state.errorMessage ? '':'d-none'}>

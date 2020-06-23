@@ -60,7 +60,7 @@ export interface ApiResponse {
                 data: res.data,
             };
 
-            resolve(response); //OVDE JE STAJALO resolve(res.data)
+            resolve(response); //OVDE JE STAJALO resolve(res.data) i zbog toga mi nije radio log in :(
     }
 
     function getToken(): string {
