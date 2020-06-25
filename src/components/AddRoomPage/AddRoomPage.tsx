@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { InputGroupCheckbox } from 'react-bootstrap/InputGroup';
+import api, { ApiResponse } from '../../api/api';
 
 interface AddRoomPageState {
     formData: {
@@ -65,9 +66,6 @@ export class AddRoomPage extends React.Component {
         const newState = Object.assign(this.state, {
             formData: newFormData,
         });
-        //let balcony = React.ChangeEvent<HTMLInputElement> document.getElementById("balcony");
-        //balcony.checked
-        
 
         this.setState(newState);
     }
@@ -177,7 +175,7 @@ export class AddRoomPage extends React.Component {
                         
                         <Form.Check type="checkbox" label="Balcony"
                         id="balcony"
-                        value="balcony"
+                        value="true"
                         data-feature-id="balcony"
                         onChange={ (event: any) => this.formInputChanged(event as any) }
                         />
@@ -185,28 +183,31 @@ export class AddRoomPage extends React.Component {
                      
                         <Form.Check type="checkbox" label="Closet"
                         id="closet"
-                        value="closet"
+                        value="true"
                         data-feature-id="closet"
                         onChange={ (event: any) => this.formInputChanged(event as any)} />
                         
                         <Form.Check type="checkbox" label="Air conditioner"
                         id="airConditioner"
-                        value="airConditioner"
+                        value="true"
                         data-feature-id="airConditioner"
                         onChange={ (event: any) => this.formInputChanged(event as any)} />
                         
                         <Form.Check type="checkbox" label="Desk"
-                        value="desk"
+                        id="desk"
+                        value="true"
                         data-feature-id="desk"
                         onChange={ (event: any) => this.formInputChanged(event as any)} />
                         
                         <Form.Check type="checkbox" label="Hairdryer"
-                        value="hairdryer"
+                        id="hairdryer"
+                        value="true"
                         data-feature-id="hairdryer"
                         onChange={ (event: any) => this.formInputChanged(event as any)} />
                         
                         <Form.Check type="checkbox" label="WiFi"
-                        value="wifi"
+                        id="wifi"
+                        value="true"
                         data-feature-id="wifi"
                         onChange={ (event: any) => this.formInputChanged(event as any)} />
 
@@ -239,7 +240,7 @@ export class AddRoomPage extends React.Component {
     }
 
     private doRegister() {
-        const data = {
+        const dataRoom = {
             numOfBeds: this.state.formData?.numOfBeds,
             bedType: this.state.formData?.bedType,
             balcony: this.state.formData?.balcony,
@@ -250,18 +251,82 @@ export class AddRoomPage extends React.Component {
             airConditioner: this.state.formData?.airConditioner,
             roomNumber: this.state.formData?.roomNumber,
             hairdryer: this.state.formData?.hairdryer,
+            rentableId: 0,
+        };
+
+        const dataRentable = {
             max_capacity: this.state.formData?.maxCapacity,
             price: this.state.formData?.price,
             wifi: this.state.formData?.wifi,
             
         };
-        console.log(data);
+       
+        api('auth/rentable', 'post', dataRentable)
+        .then((res: ApiResponse) => {
+            console.log(res);
+
+            if (res.status === 'error') {
+                this.setErrorMessage('System error... Try again!');
+                return;
+            }
+
+            if ( res.data.statusCode !== undefined ) {
+                this.handleErrors(res.data);
+                return;
+            }
+
+            //dataRoom.rentableId = res.data.rentableId
+        })    
+        api('auth/room', 'post', dataRoom)
+        .then((res: ApiResponse) => {
+            console.log(res);
+
+            if (res.status === 'error') {
+                this.setErrorMessage('System error... Try again!');
+                return;
+            }
+
+            if ( res.data.statusCode !== undefined ) {
+                this.handleErrors(res.data);
+                return;
+            }
+
+            this.registrationComplete();
+        })    
+       
+        
         /*return (
             <p>
                 Adding a room...<br />
                 <Link to="/">Click here</Link> to to go to the home page.
             </p>
         );*/
+    }
+
+    private setErrorMessage(message: string) {
+        const newState = Object.assign(this.state, {
+            message: message,
+        });
+
+        this.setState(newState);
+    }
+
+    private handleErrors(data: any) {
+        let message = '';
+
+        switch (data.statusCode) {
+            case -6001: message = 'This room already exists!'; break;
+        }
+
+        this.setErrorMessage(message);
+    }
+
+    private registrationComplete() {
+        const newState = Object.assign(this.state, {
+            isRegistrationComplete: true,
+        });
+
+        this.setState(newState);
     }
 
 }
