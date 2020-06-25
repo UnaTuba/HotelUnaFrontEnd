@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { InputGroupCheckbox } from 'react-bootstrap/InputGroup';
 import api, { ApiResponse } from '../../api/api';
 
-interface AddRoomPageState {
+interface AddAllPageState {
     formData: {
         numOfBeds: number;
         bedType: "single" | "double" | "bunk_bed" | "king_size";
@@ -25,14 +25,29 @@ interface AddRoomPageState {
       
         
     };
-
+    rentableId: number;
     message?: string;
 
     isRegistrationComplete: boolean;
 }
 
+interface AddRoomPageState {
+   
+        numOfBeds: number;
+        bedType: "single" | "double" | "bunk_bed" | "king_size";
+        roomNumber: number;
+        orientation: "east" | "west" | "south" | "north";
+        floor: number;
+        closet: boolean;
+         balcony: boolean;
+        desk: boolean;
+        airConditioner: boolean;
+        hairdryer: boolean;
+        rentableId: number;
+}
+
 export class AddRoomPage extends React.Component {
-    state: AddRoomPageState;
+    state: AddAllPageState;
 
     constructor(props: Readonly<{}>) {
         super(props);
@@ -46,15 +61,15 @@ export class AddRoomPage extends React.Component {
             floor: 1,
             roomNumber: 1,
             maxCapacity: 1,
-            price: 0,
+            price: 1,
                 balcony: false,
                 closet: false,
                 desk: false,
                 airConditioner: false,
                 hairdryer: false,
                 wifi: false,
-       
             },
+            rentableId: -1,
         };
     }
 
@@ -238,9 +253,72 @@ export class AddRoomPage extends React.Component {
             </p>
         );
     }
+    
 
     private doRegister() {
-        const dataRoom = {
+        
+
+        const dataRentable = {
+            maxCapacity: this.state.formData.maxCapacity,
+            price: this.state.formData.price,
+            wifi: this.state.formData.wifi,
+            
+        };
+       
+        api('api/rentable', 'post', dataRentable)
+        .then((res: ApiResponse) => {
+            //console.log(res);
+
+            if (res.status === 'error') {
+                this.setErrorMessage('System error... Try again!');
+                return;
+            }
+
+            if ( res.data.statusCode !== undefined ) {
+                this.handleErrors(res.data);
+                return;
+            }
+
+            this.setRentableId (res.data.rentableId);
+        })    
+
+    }
+
+    getRoom(dataRoom: AddRoomPageState){
+        api('api/room', 'post', dataRoom)
+        .then((res: ApiResponse) => {
+            console.log(dataRoom);
+            console.log(res);
+            if (res.status === 'error') {
+                this.setErrorMessage('System error... Try again!');
+                return;
+            }
+
+            if ( res.data.statusCode !== undefined ) {
+                this.handleErrors(res.data);
+                return;
+            }
+            console.log(res.data);
+            this.registrationComplete();
+        })    
+    }
+
+    private setErrorMessage(message: string) {
+        const newState = Object.assign(this.state, {
+            message: message,
+        });
+
+        this.setState(newState);
+    }
+
+    private setRentableId(message: number) {
+        const newState = Object.assign(this.state, {
+            rentableId: message,
+        });
+
+        this.setState(newState);
+
+        const dataRoom: AddRoomPageState = {
             numOfBeds: this.state.formData?.numOfBeds,
             bedType: this.state.formData?.bedType,
             balcony: this.state.formData?.balcony,
@@ -251,65 +329,16 @@ export class AddRoomPage extends React.Component {
             airConditioner: this.state.formData?.airConditioner,
             roomNumber: this.state.formData?.roomNumber,
             hairdryer: this.state.formData?.hairdryer,
-            rentableId: 0,
+            rentableId: this.state.rentableId,
         };
-
-        const dataRentable = {
-            max_capacity: this.state.formData?.maxCapacity,
-            price: this.state.formData?.price,
-            wifi: this.state.formData?.wifi,
-            
-        };
-       
-        api('auth/rentable', 'post', dataRentable)
-        .then((res: ApiResponse) => {
-            console.log(res);
-
-            if (res.status === 'error') {
-                this.setErrorMessage('System error... Try again!');
-                return;
-            }
-
-            if ( res.data.statusCode !== undefined ) {
-                this.handleErrors(res.data);
-                return;
-            }
-
-            //dataRoom.rentableId = res.data.rentableId
-        })    
-        api('auth/room', 'post', dataRoom)
-        .then((res: ApiResponse) => {
-            console.log(res);
-
-            if (res.status === 'error') {
-                this.setErrorMessage('System error... Try again!');
-                return;
-            }
-
-            if ( res.data.statusCode !== undefined ) {
-                this.handleErrors(res.data);
-                return;
-            }
-
-            this.registrationComplete();
-        })    
-       
-        
-        /*return (
-            <p>
-                Adding a room...<br />
-                <Link to="/">Click here</Link> to to go to the home page.
-            </p>
-        );*/
+        if (dataRoom.rentableId !== -1){
+            return this.getRoom(dataRoom);
+        }
+        this.setErrorMessage('Rentable not found... Try again!');
+        return;
     }
 
-    private setErrorMessage(message: string) {
-        const newState = Object.assign(this.state, {
-            message: message,
-        });
 
-        this.setState(newState);
-    }
 
     private handleErrors(data: any) {
         let message = '';
