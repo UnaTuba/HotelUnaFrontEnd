@@ -15,6 +15,7 @@ import UserLoginPage from './components/UserLoginPage/UserLoginPage';
 import ClientPage from './components/ClientPage/ClientPage';
 import RoomPage from './components/RoomPage/RoomPage';
 import RentablePage from './components/RentablePage/RentablePage';
+import { AddRoomPage } from './components/AddRoomPage/AddRoomPage';
 
 const menuItems = [
   new MainMenuItem("Home","/"),
@@ -22,6 +23,7 @@ const menuItems = [
   new MainMenuItem("About us","/about/"),
   new MainMenuItem("Clients","/clients/"),
   new MainMenuItem("Log in/out","/user/login/"),
+  new MainMenuItem("Add room","/addroom/"),
   //new MainMenuItem("Client 1","/client/1/"),
   //new MainMenuItem("Client 2","/client/2/"),
   //new MainMenuItem("Client 3","/client/3/")
@@ -38,6 +40,7 @@ ReactDOM.render(
         <Route exact path="/user/login" component={ UserLoginPage } />
         <Route exact path="/clients" component = { ClientPage } />
         <Route exact path="/rooms" component = { RoomPage } />
+        <Route exact path="/addroom" component = { AddRoomPage } />
         <Route exact path="/rentables" component = { RentablePage } />
       </Switch>
     </HashRouter>
